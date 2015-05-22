@@ -147,6 +147,8 @@
   //   }); // should be 5, regardless of the iterator function passed in
   //          No accumulator is given so the first element is used.
   _.reduce = function(collection, iterator, accumulator) {
+    _.each(collection, function(item){ accumulator === undefined ? accumulator = item : accumulator = iterator(accumulator,item) });
+    return accumulator;
   };
 
   // Determine if the array or object contains a given value (using `===`).
@@ -165,12 +167,31 @@
   // Determine whether all of the elements match a truth test.
   _.every = function(collection, iterator) {
     // TIP: Try re-using reduce() here.
+    if (iterator === undefined) {
+        return _.reduce(collection, function(allTrue, item){
+            if (item){
+                return allTrue;
+            }
+            return false;
+        }, true);
+    }
+    return _.reduce(collection, function(allTrue, item){
+        if (iterator(item)){
+            return allTrue;
+        }
+        return false;
+    }, true);
   };
 
   // Determine whether any of the elements pass a truth test. If no iterator is
   // provided, provide a default one
   _.some = function(collection, iterator) {
     // TIP: There's a very clever way to re-use every() here.
+    // I wouldn't exactly call De Morgan's Law 'very' clever
+    if (iterator === undefined) {
+        return !(_.every(collection, function(item){ return !(item); }));
+    }
+    return !(_.every(collection, function(item){ return !(iterator(item));}));
   };
 
 
